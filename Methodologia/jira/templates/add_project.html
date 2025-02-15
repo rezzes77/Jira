@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить проект{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4 text-primary">Добавить проект</h2>
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">Название проекта</label>
+                {{ form.name }}
+            </div>
+
+           <div class="mb-3">
+    <label for="{{ form.developers.id_for_label }}" class="form-label fw-semibold">Разработчики</label>
+    <div class="checkbox-group">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Выбор</th>
+                    <th>Имя разработчика</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for developer in form.developers %}
+                <tr>
+                    <td>
+                        {{ developer.tag }}  <!-- Django сам вставит правильный чекбокс -->
+                    </td>
+                    <td>
+                        <label for="{{ developer.id_for_label }}">{{ developer.choice_label }}</label>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label fw-semibold">Описание</label>
+                {{ form.description }}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.deadline.id_for_label }}" class="form-label fw-semibold">Дедлайн <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                    <input type="date" name="deadline" class="form-control" id="{{ form.deadline.id_for_label }}">
+                </div>
+                <div class="form-text">Выберите конечную дату выполнения проекта.</div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg px-4">Добавить</button>
+                <a href="{% url 'project_list' %}" class="btn btn-secondary btn-lg px-4">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    select, textarea, input {
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 100%;
+    }
+
+    select[multiple] {
+        height: 150px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+</style>
+
+
+{% endblock %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").addEventListener("submit", function (event) {
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.classList.add("was-validated");
+        });
+    });
+</script>

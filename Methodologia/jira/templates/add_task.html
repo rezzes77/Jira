@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить задачу{% endblock %}
+
+{% block styles %}
+<style>
+    .task-form {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select, .form-textarea {
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus, .form-textarea:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    .form-textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        border: none;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    .input-group-text {
+        background: #3498db;
+        color: white;
+        border: none;
+    }
+
+    .form-text {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .status-priority-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .status-priority-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+    .status-priority-item:hover {
+        border-color: #3498db;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-priority-item label {
+        font-weight: 500;
+        color: #34495e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="task-form">
+    <h2 class="text-center mb-4 text-primary">Добавить задачу</h2>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Название задачи -->
+        <div class="mb-4">
+            <label for="{{ form.title.id_for_label }}" class="form-label">Название задачи</label>
+            <input type="text" name="title" class="form-control" id="{{ form.title.id_for_label }}" required>
+            <div class="error-message">
+                {{ form.title.errors }}
+            </div>
+        </div>
+
+        <!-- Описание задачи -->
+        <div class="mb-4">
+            <label for="{{ form.description.id_for_label }}" class="form-label">Описание</label>
+            <textarea name="description" class="form-control form-textarea" id="{{ form.description.id_for_label }}" required></textarea>
+            <div class="error-message">
+                {{ form.description.errors }}
+            </div>
+        </div>
+
+        <!-- Статус и приоритет -->
+        <div class="status-priority-group">
+            <!-- Статус -->
+            <div class="status-priority-item">
+                <label for="{{ form.status.id_for_label }}" class="form-label">Статус</label>
+                <select name="status" class="form-select" id="{{ form.status.id_for_label }}" required>
+                    {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <div class="error-message">
+                    {{ form.status.errors }}
+                </div>
+            </div>
+
+            <!-- Приоритет -->
+            <div class="status-priority-item">
+                <label for="{{ form.priority.id_for_label }}" class="form-label">Приоритет</label>
+                <select name="priority" class="form-select" id="{{ form.priority.id_for_label }}" required>
+                    {% for value, label in form.priority.field.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <div class="error-message">
+                    {{ form.priority.errors }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Разработчик -->
+        <div class="mb-4">
+            <label for="{{ form.developer.id_for_label }}" class="form-label">Разработчик</label>
+            <select name="developer" class="form-select" id="{{ form.developer.id_for_label }}" required>
+                {% for dev in form.developer.field.queryset %}
+                    <option value="{{ dev.id }}">{{ dev.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="error-message">
+                {{ form.developer.errors }}
+            </div>
+        </div>
+
+        <!-- Проект -->
+        <div class="mb-4">
+            <label for="{{ form.project.id_for_label }}" class="form-label">Проект</label>
+            <select name="project" class="form-select" id="{{ form.project.id_for_label }}">
+                <option value="">Без проекта</option>
+                {% for project in form.project.field.queryset %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="error-message">
+                {{ form.project.errors }}
+            </div>
+        </div>
+
+        <!-- Дедлайн -->
+        <div class="mb-4">
+            <label for="{{ form.deadline.id_for_label }}" class="form-label">Дедлайн</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                <input type="datetime-local" name="deadline" class="form-control" id="{{ form.deadline.id_for_label }}">
+            </div>
+            <div class="form-text">Выберите дату и время выполнения задачи.</div>
+            <div class="error-message">
+                {{ form.deadline.errors }}
+            </div>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary me-2">Добавить задачу</button>
+            <a href="{% url 'task_list' %}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Валидация формы
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add("was-validated");
+        });
+
+        // Анимация для поля с датой
+        const dateInput = document.querySelector('input[type="datetime-local"]');
+        dateInput.addEventListener('focus', function () {
+            this.parentElement.style.borderColor = '#3498db';
+            this.parentElement.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.2)';
+        });
+
+        dateInput.addEventListener('blur', function () {
+            this.parentElement.style.borderColor = '#e0e0e0';
+            this.parentElement.style.boxShadow = 'none';
+        });
+    });
+</script>
+{% endblock %}

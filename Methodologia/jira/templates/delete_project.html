@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить проект{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4 text-danger">Удалить проект</h2>
+        <p class="text-center">Вы уверены, что хотите удалить проект "<strong>{{ project.name }}</strong>"?</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="text-center">
+                <button type="submit" class="btn btn-danger btn-lg px-4">Удалить</button>
+                <a href="{% url 'project_list' %}" class="btn btn-secondary btn-lg px-4">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+{% endblock %}

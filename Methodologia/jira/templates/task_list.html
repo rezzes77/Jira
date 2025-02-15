@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Список задач{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Список задач</h2>
+
+    <!-- Кнопки добавления -->
+    <div class="mb-4">
+        <a href="{% url 'add_developer' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Добавить разработчика
+        </a>
+        <a href="{% url 'add_project' %}" class="btn btn-secondary">
+            <i class="bi bi-folder-plus"></i> Добавить проект
+        </a>
+        <a href="{% url 'add_task' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Добавить задачу
+        </a>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="q" class="form-control"
+                           placeholder="Поиск по названию" value="{{ request.GET.q }}">
+                </div>
+
+                <div class="col-md-3">
+                    <select name="developer" class="form-select">
+                        <option value="">Все разработчики</option>
+                        {% for dev in developers %}
+                        <option value="{{ dev.id }}"
+                            {% if request.GET.developer == dev.id|stringformat:"i" %}selected{% endif %}>
+                            {{ dev.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <input type="date" name="date" class="form-control"
+                           value="{{ request.GET.date }}">
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-funnel"></i> Фильтровать
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Навигация по статусам -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link {% if not request.GET.status %}active{% endif %}"
+               href="?">Все</a>
+        </li>
+        {% for status_key, status_name in Task.STATUS_CHOICES %}
+        <li class="nav-item">
+            <a class="nav-link {% if request.GET.status == status_key %}active{% endif %}"
+               href="?status={{ status_key }}">{{ status_name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Таблица задач -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Название</th>
+                    <th>Разработчик</th>
+                    <th>Проект</th>
+                    <th>Статус</th>
+                    <th>Дедлайн</th>
+                    <th>Приоритет</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr class="{% cycle 'table-default' 'table-light' %}">
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.developer.name|default:"-" }}</td>
+                    <td>{{ task.project.name|default:"-" }}</td>
+                    <td>
+                        <span class="badge
+                            {% if task.status == 'todo' %}bg-secondary
+                            {% elif task.status == 'in_progress' %}bg-primary
+                            {% else %}bg-success{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if task.deadline %}
+                            {{ task.deadline|date:"d.m.Y H:i" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge
+                            {% if task.priority == 'low' %}bg-success
+                            {% elif task.priority == 'medium' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'edit_task' task.id %}"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'delete_task' task.id %}"
+                               class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted">Нет задач</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

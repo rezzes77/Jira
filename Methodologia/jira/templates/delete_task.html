@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить задачу{% endblock %}
+
+{% block styles %}
+<style>
+    .delete-card {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .warning-icon {
+        font-size: 4rem;
+        color: #e74c3c;
+        margin-bottom: 1.5rem;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .task-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 1rem 0;
+        word-break: break-word;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+    }
+
+    .detail-item {
+        margin: 0.5rem 0;
+        color: #7f8c8d;
+    }
+
+    .detail-item strong {
+        color: #2c3e50;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-card text-center">
+    <i class="bi bi-exclamation-triangle-fill warning-icon"></i>
+    <h2 class="mb-4">Подтверждение удаления</h2>
+    
+    <div class="task-title">
+        "{{ task.title }}"
+    </div>
+
+    <div class="details mb-4">
+        <div class="detail-item">
+            <strong>Статус:</strong>
+            <span class="badge 
+                {% if task.status == 'todo' %}bg-secondary
+                {% elif task.status == 'in_progress' %}bg-primary
+                {% else %}bg-success{% endif %}">
+                {{ task.get_status_display }}
+            </span>
+        </div>
+        <div class="detail-item">
+            <strong>Приоритет:</strong>
+            <span class="badge 
+                {% if task.priority == 'low' %}bg-success
+                {% elif task.priority == 'medium' %}bg-warning
+                {% else %}bg-danger{% endif %}">
+                {{ task.get_priority_display }}
+            </span>
+        </div>
+        <div class="detail-item">
+            <strong>Дедлайн:</strong>
+            {% if task.deadline %}
+                {{ task.deadline|date:"d.m.Y H:i" }}
+            {% else %}
+                Не установлен
+            {% endif %}
+        </div>
+    </div>
+
+    <p class="text-muted mb-4">Вы уверены, что хотите удалить эту задачу? Это действие нельзя отменить.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex gap-3 justify-content-center">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Удалить навсегда
+            </button>
+            <a href="{% url 'task_list' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
