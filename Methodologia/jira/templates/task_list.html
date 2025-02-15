@@ -1,7 +1,194 @@
 {% extends "base.html" %}
+
 {% block title %}Список задач{% endblock %}
 
 {% block content %}
+
+<style>
+    /* Общие стили */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #2c3e50;
+}
+
+/* Стиль заголовков */
+h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 30px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+h2:hover {
+    color: #007bff;
+    transform: scale(1.03); /* Меньшее увеличение */
+}
+
+/* Кнопки */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: scale(1.05); /* Уменьшили эффект увеличения */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Более лёгкая тень */
+}
+
+.btn-primary, .btn-secondary, .btn-success {
+    border-radius: 20px;
+}
+
+/* Карточки фильтров */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.08); /* Лёгкая тень */
+}
+
+.card-body {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+/* Фильтры */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3); /* Лёгкое свечение */
+}
+
+/* Статус задач - badge */
+.badge {
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 8px 12px; /* Уменьшено немного расстояние */
+    border-radius: 50px;
+    transition: background-color 0.2s ease; /* Уменьшена продолжительность */
+}
+
+.badge:hover {
+    transform: scale(1.03); /* Лёгкое увеличение */
+}
+
+/* Таблицы */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: center;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f9f9f9; /* Меньше контрастное изменение фона */
+    transform: scale(1); /* Убираем увеличение */
+    transition: all 0.2s ease;
+}
+
+/* Анимация появления таблиц */
+.table-responsive {
+    opacity: 0;
+    animation: fadeIn 0.8s forwards; /* Уменьшена продолжительность */
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+/* Анимации для кнопок действий */
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 8px; /* Меньше отступов */
+}
+
+.btn-group button, .btn-group a {
+    transition: all 0.2s ease;
+}
+
+.btn-group button:hover, .btn-group a:hover {
+    transform: scale(1.05); /* Уменьшено увеличение */
+    background-color: #f9f9f9;
+    border-color: #007bff;
+}
+
+/* Стили для вкладок */
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 20px;
+}
+
+.nav-tabs .nav-link {
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    border-radius: 25px;
+}
+
+.nav-tabs {
+    margin-bottom: 20px;
+}
+
+/* Анимация для вкладок */
+.tab-pane {
+    opacity: 0;
+    animation: fadeInTab 0.6s forwards; /* Уменьшена продолжительность */
+}
+
+@keyframes fadeInTab {
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const taskTabs = new bootstrap.Tab(document.querySelector('#taskTab'));
+        const tabLinks = document.querySelectorAll('.nav-link');
+
+        tabLinks.forEach(function (tabLink) {
+            tabLink.addEventListener('click', function () {
+                setTimeout(function () {
+                    taskTabs.show();
+                }, 200);
+            });
+        });
+    });
+</script>
+{% if not request.user.is_authenticated and not request.session.guest %}
+    <meta http-equiv="refresh" content="0; url={% url 'login' %}">
+{% else %}
+    <!-- Остальной контент -->
+    {% if request.user.is_authenticated %}
+
+
+    <!-- В таблице скрываем кнопки для гостей -->
+    <td>
+        {% if request.user.is_authenticated %}
+        <div class="btn-group">
+            <!-- Кнопки действий -->
+        </div>
+        {% endif %}
+    </td>
+{% endif %}
+
 <div class="container mt-4">
     <h2 class="mb-4">Список задач</h2>
 
@@ -53,83 +240,261 @@
         </div>
     </div>
 
-    <!-- Навигация по статусам -->
-    <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-            <a class="nav-link {% if not request.GET.status %}active{% endif %}"
-               href="?">Все</a>
-        </li>
-        {% for status_key, status_name in Task.STATUS_CHOICES %}
-        <li class="nav-item">
-            <a class="nav-link {% if request.GET.status == status_key %}active{% endif %}"
-               href="?status={{ status_key }}">{{ status_name }}</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <!-- Tab Panel для статусов -->
+    <div class="row">
+        <div class="col">
+            <ul class="nav nav-tabs" id="taskTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="todo-tab" data-bs-toggle="tab" href="#todo" role="tab" aria-controls="todo" aria-selected="true">To Do</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="in-progress-tab" data-bs-toggle="tab" href="#in-progress" role="tab" aria-controls="in-progress" aria-selected="false">In Progress</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="done-tab" data-bs-toggle="tab" href="#done" role="tab" aria-controls="done" aria-selected="false">Done</a>
+                </li>
+            </ul>
 
-    <!-- Таблица задач -->
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Название</th>
-                    <th>Разработчик</th>
-                    <th>Проект</th>
-                    <th>Статус</th>
-                    <th>Дедлайн</th>
-                    <th>Приоритет</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in tasks %}
-                <tr class="{% cycle 'table-default' 'table-light' %}">
-                    <td>{{ task.title }}</td>
-                    <td>{{ task.developer.name|default:"-" }}</td>
-                    <td>{{ task.project.name|default:"-" }}</td>
-                    <td>
-                        <span class="badge
-                            {% if task.status == 'todo' %}bg-secondary
-                            {% elif task.status == 'in_progress' %}bg-primary
-                            {% else %}bg-success{% endif %}">
-                            {{ task.get_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        {% if task.deadline %}
-                            {{ task.deadline|date:"d.m.Y H:i" }}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="badge
-                            {% if task.priority == 'low' %}bg-success
-                            {% elif task.priority == 'medium' %}bg-warning
-                            {% else %}bg-danger{% endif %}">
-                            {{ task.get_priority_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="btn-group">
-                            <a href="{% url 'edit_task' task.id %}"
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <a href="{% url 'delete_task' task.id %}"
-                               class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center text-muted">Нет задач</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <div class="tab-content mt-3" id="taskTabContent">
+                <!-- To Do -->
+                <div class="tab-pane fade show active" id="todo" role="tabpanel" aria-labelledby="todo-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Разработчик</th>
+                                    <th>Проект</th>
+                                    <th>Статус</th>
+                                    <th>Дедлайн</th>
+                                    <th>Приоритет</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks_by_status.todo %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>{{ task.developer.name|default:"-" }}</td>
+                                    <td>{{ task.project.name|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if task.deadline %}
+                                            {{ task.deadline|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge
+                                            {% if task.priority == 'low' %}bg-success
+                                            {% elif task.priority == 'medium' %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="in_progress">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary" title="In Progress">
+                                                    <i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="done">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Done">
+                                                    <i class="bi bi-check2"></i>
+                                                </button>
+                                            </form>
+<a href="{% url 'info_task' task.id %}" class="btn btn-sm btn-info">
+    <i class="bi bi-info-circle"></i>
+</a>
+                                            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Нет задач в этом статусе</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- In Progress -->
+                <div class="tab-pane fade" id="in-progress" role="tabpanel" aria-labelledby="in-progress-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Разработчик</th>
+                                    <th>Проект</th>
+                                    <th>Статус</th>
+                                    <th>Дедлайн</th>
+                                    <th>Приоритет</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks_by_status.in_progress %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>{{ task.developer.name|default:"-" }}</td>
+                                    <td>{{ task.project.name|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if task.deadline %}
+                                            {{ task.deadline|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge
+                                            {% if task.priority == 'low' %}bg-success
+                                            {% elif task.priority == 'medium' %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="todo">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="To Do">
+                                                    <i class="bi bi-arrow-left"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="done">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Done">
+                                                    <i class="bi bi-check2"></i>
+                                                </button>
+                                            </form>
+<a href="{% url 'info_task' task.id %}" class="btn btn-sm btn-info">
+    <i class="bi bi-info-circle"></i>
+</a>
+                                            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Нет задач в этом статусе</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Done -->
+                <div class="tab-pane fade" id="done" role="tabpanel" aria-labelledby="done-tab">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Разработчик</th>
+                                    <th>Проект</th>
+                                    <th>Статус</th>
+                                    <th>Дедлайн</th>
+                                    <th>Приоритет</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks_by_status.done %}
+                                <tr>
+                                    <td>{{ task.title }}</td>
+                                    <td>{{ task.developer.name|default:"-" }}</td>
+                                    <td>{{ task.project.name|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if task.deadline %}
+                                            {{ task.deadline|date:"d.m.Y H:i" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge
+                                            {% if task.priority == 'low' %}bg-success
+                                            {% elif task.priority == 'medium' %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="todo">
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="To Do">
+                                                    <i class="bi bi-arrow-left"></i>
+                                                </button>
+                                            </form>
+                                            <form action="{% url 'move_task' task.id %}" method="post" class="d-inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="next_status" value="in_progress">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary" title="In Progress">
+                                                    <i class="bi bi-arrow-right"></i>
+                                                </button>
+                                            </form>
+                                            <a href="{% url 'info_task' task.id %}" class="btn btn-sm btn-info">
+    <i class="bi bi-info-circle"></i>
+</a>
+                                            <a href="{% url 'edit_task' task.id %}" class="btn btn-sm btn-outline-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Нет задач в этом статусе</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+    {% endif %}
 {% endblock %}

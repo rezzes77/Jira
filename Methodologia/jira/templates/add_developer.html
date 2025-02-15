@@ -1,231 +1,32 @@
 {% extends "base.html" %}
+
 {% block title %}Добавить разработчика{% endblock %}
 
-{% block styles %}
-<style>
-    .developer-form {
-        max-width: 600px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background: #f8f9fa;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        transform: translateY(20px);
-        opacity: 0;
-        animation: formEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    }
-
-    @keyframes formEntrance {
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .form-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .form-header h2 {
-        color: #2c3e50;
-        font-size: 2.2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-        position: relative;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #34495e;
-        font-weight: 500;
-        transition: transform 0.3s ease;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-        border-color: #3498db;
-        box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
-        outline: none;
-    }
-
-    .form-control:hover {
-        border-color: #bdc3c7;
-    }
-
-    .btn-submit {
-        background: #3498db;
-        color: white;
-        padding: 12px 25px;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-submit:hover {
-        background: #2980b9;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(52,152,219,0.3);
-    }
-
-    .btn-submit i {
-        font-size: 1.2rem;
-    }
-
-    /* Анимация при фокусе */
-    .form-group:focus-within .form-label {
-        transform: translateX(10px);
-        color: #3498db;
-    }
-
-    /* Ошибки валидации */
-    .error-list {
-        color: #e74c3c;
-        margin-top: 0.5rem;
-        list-style: none;
-        padding-left: 0;
-        animation: shake 0.4s ease;
-    }
-
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-10px); }
-        75% { transform: translateX(10px); }
-    }
-
-    .error-input {
-        border-color: #e74c3c !important;
-        animation: errorPulse 0.6s ease;
-    }
-
-    @keyframes errorPulse {
-        50% { border-color: #ff9d9d; }
-    }
-
-    @media (max-width: 768px) {
-        .developer-form {
-            margin: 1rem;
-            padding: 1.5rem;
-        }
-    }
-
-    .form-group.focused .form-label {
-        color: #3498db;
-    }
-
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="developer-form">
-    <div class="form-header">
-        <h2>Добавить разработчика</h2>
-        <p>Заполните информацию о новом разработчике</p>
-    </div>
+<div class="container mt-4">
+    <h2 class="mb-4">Добавить разработчика</h2>
 
+    <!-- Форма добавления разработчика -->
     <form method="post">
         {% csrf_token %}
-
-        <div class="form-group">
-            <label class="form-label" for="id_name">Имя</label>
-            {{ form.name }}
-            {% if form.name.errors %}
-                <ul class="error-list">
-                    {% for error in form.name.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Имя разработчика</label>
+            <input type="text" class="form-control" id="name" name="name" required>
         </div>
-
-        <div class="form-group">
-            <label class="form-label" for="id_email">Email</label>
-            {{ form.email }}
-            {% if form.email.errors %}
-                <ul class="error-list">
-                    {% for error in form.email.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
         </div>
-
-        <div class="form-group">
-            <label class="form-label" for="id_group">Группа</label>
-            {{ form.group }}
-            {% if form.group.errors %}
-                <ul class="error-list">
-                    {% for error in form.group.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        <div class="mb-3">
+            <label for="group" class="form-label">Группа</label>
+            <input type="text" class="form-control" id="group" name="group" required>
         </div>
-
-        <div class="form-group">
-            <label class="form-label" for="id_number">Телефон</label>
-            {{ form.number }}
-            {% if form.number.errors %}
-                <ul class="error-list">
-                    {% for error in form.number.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+        <div class="mb-3">
+            <label for="number" class="form-label">Номер телефона</label>
+            <input type="text" class="form-control" id="number" name="number" required>
         </div>
-
-        <div class="form-group" style="text-align: center; margin-top: 2rem;">
-            <button type="submit" class="btn-submit">
-                <i class="bi bi-person-plus"></i>
-                Добавить разработчика
-            </button>
-        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a href="{% url 'developer_list' %}" class="btn btn-secondary">Назад</a>
     </form>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Add error animation and focus styles
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if form.errors %}
-            {% for field in form %}
-                {% if field.errors %}
-                    const fieldElement = document.getElementById('id_{{ field.name }}');
-                    fieldElement.classList.add('error-input');
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    });
-
-    // Focus effect
-    const inputs = document.querySelectorAll('.form-control');
-    inputs.forEach(input => {
-        input.addEventListener('focus', function() {
-            this.closest('.form-group').classList.add('focused');
-        });
-
-        input.addEventListener('blur', function() {
-            this.closest('.form-group').classList.remove('focused');
-        });
-    });
-</script>
 {% endblock %}

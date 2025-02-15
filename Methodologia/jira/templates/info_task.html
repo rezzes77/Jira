@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Вставляем стили прямо в шаблон -->
+<style>
+    body {
+        background: #2c3e50; /* Легкий фоновый цвет для страницы */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .card {
+        background-color: #e8e1e1; /* Белый фон для карточки */
+        border-radius: 10px; /* Закругленные углы */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для карточки */
+    }
+
+    .card-header {
+        background: linear-gradient(45deg, #5769cc, #5769cc); /* Градиентный фон для заголовка */
+        color: white;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    h2, h4 {
+        font-size: 1.5rem;
+        color: #333333;
+    }
+
+    .card-footer {
+        background-color: #f8f9fa;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .btn-info {
+        background-color: #1b3e5e; /* Цвет кнопки с иконкой */
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 30px;
+        text-decoration: none;
+    }
+
+    .btn-info:hover {
+        background-color: #138496; /* Более темный цвет при наведении */
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 50px;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    .text-primary {
+        color: #1b3e5e !important;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .me-2 {
+        margin-right: 0.5rem;
+    }
+
+    .mb-2 {
+        margin-bottom: 0.5rem;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="card shadow-lg rounded">
+        <div class="card-header d-flex align-items-center">
+            <i class="fas fa-tasks me-2"></i>
+            <h2 class="mb-0">Информация о задаче</h2>
+        </div>
+        <div class="card-body">
+            <h4 class="text-primary">
+                <i class="fas fa-tag me-2"></i> {{ task.title }}
+            </h4>
+            <p class="text-muted mb-4">
+                <i class="fas fa-align-left me-2"></i> {{ task.description }}
+            </p>
+
+            <hr>
+
+            <p class="mb-2">
+                <strong><i class="fas fa-user me-2"></i> Разработчик:</strong>
+                <span>{{ task.developer }}</span>
+            </p>
+            <p class="mb-2">
+                <strong><i class="fas fa-project-diagram me-2"></i> Проект:</strong>
+                <span>{{ task.project|default:"Не назначен" }}</span>
+            </p>
+            <p class="mb-2">
+                <strong><i class="fas fa-list-alt me-2"></i> Статус:</strong>
+                <span class="badge bg-{% if task.status == 'todo' %}secondary{% elif task.status == 'in_progress' %}warning{% else %}success{% endif %}">
+                    {{ task.get_status_display }}
+                </span>
+            </p>
+            <p class="mb-2">
+                <strong><i class="fas fa-exclamation-circle me-2"></i> Приоритет:</strong>
+                <span class="badge bg-{% if task.priority == 'low' %}success{% elif task.priority == 'medium' %}warning{% else %}danger{% endif %}">
+                    {{ task.get_priority_display }}
+                </span>
+            </p>
+            <p class="mb-2">
+                <strong><i class="far fa-calendar-alt me-2"></i> Дата создания:</strong>
+                <span>{{ task.created_at|date:"d M Y H:i" }}</span>
+            </p>
+            <p class="mb-4">
+                <strong><i class="far fa-clock me-2"></i> Последнее обновление:</strong>
+                <span>{{ task.updated_at|date:"d M Y H:i" }}</span>
+            </p>
+            <p>
+                <strong><i class="fas fa-hourglass-half me-2"></i> Дедлайн:</strong>
+                <span>{{ task.deadline|default:"Не установлен" }}</span>
+            </p>
+        </div>
+        <div class="card-footer text-end">
+            <a href="{% url 'task_list' %}" class="btn btn-outline-primary rounded-pill px-4 py-2">
+                <i class="fas fa-arrow-left me-2"></i> Назад
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

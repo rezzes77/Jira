@@ -1,3 +1,4 @@
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 from . import views
 
@@ -19,13 +20,17 @@ urlpatterns = [
     path('delete-task/<int:pk>/', views.delete_task, name='delete_task'),
 
     # AJAX
-    path('move-task/<int:pk>/<str:status>/', views.move_task, name='move_task'),
-
+    path('move_task/<int:pk>/', views.move_task, name='move_task'),
 
     path('edit_project/<int:pk>/', views.edit_project, name='edit_project'),
     path('delete_project/<int:pk>/', views.delete_project, name='delete_project'),
+    path('task/<int:task_id>/', views.info_task, name='info_task'),
 
     path('edit_developer/<int:pk>/', views.edit_developer, name='edit_developer'),
     path('delete_developer/<int:pk>/', views.delete_developer, name='delete_developer'),
+    path('login/', views.login_view, name='login'),
+    path('guest/', views.guest_access, name='guest_access'),
+    path('logout/', views.custom_logout, name='logout'),
+
 ]
 

@@ -44,14 +44,21 @@
                 {{ form.description }}
             </div>
 
-            <div class="mb-3">
-                <label for="{{ form.deadline.id_for_label }}" class="form-label fw-semibold">Дедлайн <span class="text-danger">*</span></label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
-                    <input type="date" name="deadline" class="form-control" id="{{ form.deadline.id_for_label }}">
-                </div>
-                <div class="form-text">Выберите конечную дату выполнения проекта.</div>
-            </div>
+            <!-- Дедлайн -->
+<div class="mb-4">
+    <label for="{{ form.deadline.id_for_label }}" class="form-label">Дедлайн</label>
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+        <input type="datetime-local" name="deadline" class="form-control"
+               id="{{ form.deadline.id_for_label }}"
+               value="{{ form.deadline.value|date:'Y-m-d\TH:i' }}">
+    </div>
+    <div class="form-text">Выберите дату выполнения задачи.</div>
+    <div class="error-message">
+        {{ form.deadline.errors }}
+    </div>
+</div>
+
 
             <div class="text-center">
                 <button type="submit" class="btn btn-success btn-lg px-4">Сохранить</button>
