@@ -1,0 +1,1 @@
+web: gunicorn Methodologia.wsgi --log-file -
