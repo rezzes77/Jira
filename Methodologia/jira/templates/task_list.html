@@ -172,6 +172,7 @@ h2:hover {
         });
     });
 </script>
+
 {% if not request.user.is_authenticated and not request.session.guest %}
     <meta http-equiv="refresh" content="0; url={% url 'login' %}">
 {% else %}
